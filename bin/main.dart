@@ -5,5 +5,6 @@ import 'package:get_it/get_it.dart';
 void main() async {
   GetIt.instance.registerSingleton(Services());
   final server = Server();
+
   await server.start();
 }
