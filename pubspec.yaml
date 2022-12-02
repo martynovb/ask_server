@@ -1,0 +1,13 @@
+name: ask_server
+description: description
+version: 0.0.1
+
+environment:
+  sdk: '>=2.18.5 <3.0.0'
+
+dependencies:
+  alfred: ^0.1.7
+
+
+dev_dependencies:
+
