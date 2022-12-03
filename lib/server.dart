@@ -5,8 +5,9 @@ class Server {
   final app = Alfred();
 
   Future<void> start() async {
-    app.get('users/login', UsersRoute.login);
-
+    app.post('/users/login', UsersRoute.login);
+    app.get('/users/currentUser', UsersRoute.currentUser);
+    app.get('/status', (req, res) => 'Server Online');
     await app.listen();
   }
 }

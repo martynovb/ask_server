@@ -1,30 +1,36 @@
 import 'package:alfred/alfred.dart';
-import 'package:ask_server/models/user.dart';
 import 'package:ask_server/services/services.dart';
 import 'package:corsac_jwt/corsac_jwt.dart';
 import 'package:dbcrypt/dbcrypt.dart';
 
 class UsersRoute {
-  static currentUser(HttpRequest req, HttpResponse res) {
-    final user = User(email: 'test@mail.com');
-    return user;
+  static currentUser(HttpRequest req, HttpResponse res) async {
+    final userToken = req.store.get('token') as JWT?;
+    if (userToken != null) {
+      final data = userToken.getClaim('data') as Map;
+      final userEmail = data['email'];
+      final foundUser =
+          await services.usersService.findUserByEmail(email: userEmail);
+      if (foundUser != null) {
+        return foundUser;
+      } else {
+        throw AlfredException(401, {'message': 'invalid token'});
+      }
+    }
   }
 
   static login(HttpRequest req, HttpResponse res) async {
     try {
-      print('req: $req');
-    final body = await req.bodyAsJsonMap;
-    final user = await services.usersService.findUserByEmail(
-      email: body['email'],
-    );
+      final body = await req.bodyAsJsonMap;
+      final user = await services.usersService.findUserByEmail(
+        email: body['email'],
+      );
 
-    if (user == null) {
-      throw AlfredException(401, {'message': 'invalid user'});
-    }
+      if (user == null) {
+        throw AlfredException(401, {'message': 'invalid user'});
+      }
 
-
-      final isCorrect = DBCrypt().checkpw(
-          user.password ?? '', body['password']);
+      final isCorrect = DBCrypt().checkpw(body['password'], user.password);
 
       if (!isCorrect) {
         throw AlfredException(401, {'message': 'wrong email or password'});
@@ -40,8 +46,12 @@ class UsersRoute {
       var signedToken = token.getSignedToken(signer);
 
       return {'token': signedToken.toString()};
-    } catch (ex){
-      throw AlfredException(401, {'message': 'wrong email or password'});
+    } on AlfredException catch (e) {
+      throw e;
+    } on Exception catch (e) {
+      throw AlfredException(500, {'message': 'unexpected exception ($e)'});
+    } catch (e) {
+      throw AlfredException(500, {'message': 'unexpected error ($e)'});
     }
   }
 

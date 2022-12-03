@@ -15,3 +15,7 @@ dev_dependencies:
   json_serializable:
   test:
   http:
+  analyzer: ^5.2.0
+
+# sudo /Users/bohdan.martynov/sdk/flutter_3.3.9/bin/cache/dart-sdk/bin/dart run build_runner build
+
