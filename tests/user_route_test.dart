@@ -23,7 +23,6 @@ void main() {
   });
 
   test('login', () async {
-    GetIt.instance.registerSingleton(Services());
     final server = Server();
 
     await server.start();
@@ -40,12 +39,13 @@ void main() {
     final loginResponse = await http.post(
         Uri.parse('http://localhost:3000/users/login'),
         body: {'email': 'test@email.com', 'password': 'password'});
+    print('loginResponse.body ${loginResponse.body}');
     final loginData = jsonDecode(loginResponse.body);
-    print('loginData: $loginData');
     final token = loginData['token'];
     final response = await http.get(
-        Uri.parse('http://localhost:3000/users/currentUser'),
-        headers: {'Authorization': 'Bearer $token'});
+      Uri.parse('http://localhost:3000/users/currentUser'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
     print('currentUserData: ${response.body}');
     expect(response.statusCode, 200);
   });

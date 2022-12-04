@@ -15,7 +15,7 @@ class UsersRoute {
       if (foundUser != null) {
         return foundUser.toJson();
       } else {
-        throw AlfredException(401, {'message': 'invalid token'});
+        throw AlfredException(401, {'message': 'user not found'});
       }
     } else {
       throw AlfredException(401, {'message': 'invalid token'});
@@ -29,11 +29,11 @@ class UsersRoute {
         email: body['email'],
       );
 
-      if (user == null) {
+      if (user == null || user.password == null) {
         throw AlfredException(401, {'message': 'invalid user'});
       }
 
-      final isCorrect = DBCrypt().checkpw(body['password'], user.password);
+      final isCorrect = DBCrypt().checkpw(body['password'], user.password!);
 
       if (!isCorrect) {
         throw AlfredException(401, {'message': 'wrong email or password'});

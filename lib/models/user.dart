@@ -6,11 +6,12 @@ part 'user.g.dart';
 @JsonSerializable()
 class User {
   String email;
-  String password;
+  @JsonKey(ignore: true)
+  String? password;
   String? firstName;
   String? lastName;
 
-  User({required this.email, required this.password, this.firstName, this.lastName});
+  User({required this.email, this.password, this.firstName, this.lastName});
 
   void setPassword(String password) {
     this.password = new DBCrypt().hashpw(password, new DBCrypt().gensalt());

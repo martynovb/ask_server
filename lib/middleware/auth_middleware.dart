@@ -6,7 +6,7 @@ class AuthMiddleware {
   static isAuthenticated(HttpRequest req, HttpResponse res) {
     final authHeader = req.headers.value('Authorization');
     if (authHeader != null) {
-      final token = authHeader.replaceAll('Bearer', '');
+      final token = authHeader.replaceAll('Bearer ', '');
       if (token.isNotEmpty) {
         final parsedToken = JWT.parse(token);
         final isValid = parsedToken.verify(services.jwtSigner);
