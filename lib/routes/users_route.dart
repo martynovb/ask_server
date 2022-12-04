@@ -5,6 +5,7 @@ import 'package:dbcrypt/dbcrypt.dart';
 
 class UsersRoute {
   static currentUser(HttpRequest req, HttpResponse res) async {
+    print('currentUser: ${req.store.get('token')}');
     final userToken = req.store.get('token') as JWT?;
     if (userToken != null) {
       final data = userToken.getClaim('data') as Map;
@@ -12,10 +13,12 @@ class UsersRoute {
       final foundUser =
           await services.usersService.findUserByEmail(email: userEmail);
       if (foundUser != null) {
-        return foundUser;
+        return foundUser.toJson();
       } else {
         throw AlfredException(401, {'message': 'invalid token'});
       }
+    } else {
+      throw AlfredException(401, {'message': 'invalid token'});
     }
   }
 
@@ -42,8 +45,7 @@ class UsersRoute {
         ..setClaim('data', {'email': user.email})
         ..getToken();
 
-      var signer = JWTHmacSha256Signer(services.JWT_SECRET_KEY);
-      var signedToken = token.getSignedToken(signer);
+      var signedToken = token.getSignedToken(services.jwtSigner);
 
       return {'token': signedToken.toString()};
     } on AlfredException catch (e) {

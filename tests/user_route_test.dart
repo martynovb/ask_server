@@ -7,6 +7,21 @@ import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
+  Server? server;
+
+  setUp(() async {
+    GetIt.instance.registerSingleton(Services());
+    server = Server();
+    await server!.start();
+  });
+
+  tearDown(() async {
+    GetIt.instance.unregister<Services>();
+    if (server != null) {
+      await server!.app.close();
+    }
+  });
+
   test('login', () async {
     GetIt.instance.registerSingleton(Services());
     final server = Server();
@@ -15,7 +30,7 @@ void main() {
 
     final response = await http.post(
       Uri.parse('http://localhost:3000/users/login/'),
-      body: {'email': 'email', 'password': 'password'},
+      body: {'email': 'test@email.com', 'password': 'password'},
     );
     final data = jsonDecode(response.body);
     expect(data['token'] != null, true);
@@ -26,11 +41,12 @@ void main() {
         Uri.parse('http://localhost:3000/users/login'),
         body: {'email': 'test@email.com', 'password': 'password'});
     final loginData = jsonDecode(loginResponse.body);
+    print('loginData: $loginData');
     final token = loginData['token'];
     final response = await http.get(
         Uri.parse('http://localhost:3000/users/currentUser'),
         headers: {'Authorization': 'Bearer $token'});
-    print('loginData: $loginData');
+    print('currentUserData: ${response.body}');
     expect(response.statusCode, 200);
   });
 }

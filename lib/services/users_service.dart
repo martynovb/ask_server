@@ -3,7 +3,7 @@ import 'package:collection/collection.dart';
 
 class UsersService {
   final _users = <User>[
-    User(email: 'email', firstName: 'Test', password: 'password')..setPassword('password'),
+    User(email: 'test@email.com', firstName: 'Test', password: 'password')..setPassword('password'),
   ];
 
   Future<User?> findUserByEmail({required String email}) async =>
