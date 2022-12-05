@@ -1,5 +1,7 @@
 import 'package:alfred/alfred.dart';
+import 'package:ask_server/models/user.dart';
 import 'package:ask_server/services/services.dart';
+import 'package:ask_server/validator.dart';
 import 'package:corsac_jwt/corsac_jwt.dart';
 import 'package:dbcrypt/dbcrypt.dart';
 
@@ -22,7 +24,7 @@ class UsersRoute {
     }
   }
 
-  static login(HttpRequest req, HttpResponse res) async {
+  static signIn(HttpRequest req, HttpResponse res) async {
     try {
       final body = await req.bodyAsJsonMap;
       final user = await services.usersService.findUserByEmail(
@@ -57,5 +59,13 @@ class UsersRoute {
     }
   }
 
-  static createAccount(HttpRequest req, HttpResponse res) {}
+  static signUp(HttpRequest req, HttpResponse res) async {
+    final body = await req.bodyAsJsonMap;
+    final newUser = User.fromJson(body);
+    newUser.setPassword(body['password']);
+    if (isUserValid(newUser)) {
+      await newUser.save();
+      return newUser;
+    }
+  }
 }

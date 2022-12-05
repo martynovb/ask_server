@@ -7,14 +7,19 @@ class Server {
 
   Future<void> start() async {
     app.post(
-      '/users/login',
-      UsersRoute.login,
+      '/users/signIn',
+      UsersRoute.signIn,
     );
 
     app.get(
       '/users/currentUser',
       UsersRoute.currentUser,
       middleware: [AuthMiddleware.isAuthenticated],
+    );
+
+    app.post(
+      '/users/signUp',
+      UsersRoute.signUp,
     );
 
     app.get(
